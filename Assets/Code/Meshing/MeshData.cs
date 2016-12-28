@@ -1,186 +1,267 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
+using Voxic.Math;
 
 namespace Voxic.Meshing
 {
+    // TODO: Consider changing the following from a class to a struct and updating parameters to be ref types
+
+    /// <summary>
+    /// Class representing mesh data
+    /// </summary>
     public class MeshData
     {
-        private List<Vector3> _vertices;
-        private List<int>[] _triangles;
-        private List<Vector2> _uvs;
-        private List<Vector3> _colliderVertices;
-        private List<int> _colliderTriangles;
-
-        public List<Vector3> Vertices
-        {
-            get { return _vertices; }
-        }
-        public List<int>[] Triangles
-        {
-            get { return _triangles; }
-        }
-        public List<Vector2> UVs
-        {
-            get { return _uvs; }
-        }
-        public List<Vector3> ColliderVertices
-        {
-            get { return _colliderVertices; }
-        }
-        public List<int> ColliderTriangles
-        {
-            get { return _colliderTriangles; }
-        }
+        /// <summary>
+        /// The mesh's vertices
+        /// </summary>
+        private List<Vector3> vertices;
+        /// <summary>
+        /// The mesh's triangles, grouped by sub-mesh ID
+        /// </summary>
+        private List<int>[] triangles;
+        /// <summary>
+        /// The mesh's uvs
+        /// </summary>
+        private List<Vector2> uvs;
+        /// <summary>
+        /// The mesh's collider vertices
+        /// </summary>
+        private List<Vector3> colliderVertices;
+        /// <summary>
+        /// The mesh's collider triangles
+        /// </summary>
+        private List<int> colliderTriangles;
 
         #region Constructor
 
-        public MeshData(int subMeshes = 1)
+        /// <summary>
+        /// Create a new empty mesh data with the given number of submeshes
+        /// </summary>
+        /// <param name="subMeshes">The number of submeshes in the mesh (defaults to 1)</param>
+        public MeshData(uint subMeshes = 1)
         {
-            _vertices = new List<Vector3>();
-            _triangles = new List<int>[subMeshes];
+            vertices = new List<Vector3>();
+            triangles = new List<int>[subMeshes];
             for (int i = 0; i < subMeshes; i++)
-                _triangles[i] = new List<int>();
-            _uvs = new List<Vector2>();
-            _colliderVertices = new List<Vector3>();
-            _colliderTriangles = new List<int>();
+                triangles[i] = new List<int>();
+            uvs = new List<Vector2>();
+            colliderVertices = new List<Vector3>();
+            colliderTriangles = new List<int>();
         }
 
-        public MeshData(MeshData meshData, int subMeshes = 1)
+        /// <summary>
+        /// Creates a copy of the given mesh data
+        /// </summary>
+        /// <param name="meshData">The mesh data to copy</param>
+        public MeshData(MeshData meshData)
         {
-            _vertices = meshData.Vertices;
-            _triangles = meshData.Triangles;
-            _uvs = meshData.UVs;
-            _colliderVertices = meshData.ColliderVertices;
-            _colliderTriangles = meshData.ColliderTriangles;
+            vertices = meshData.vertices;
+            triangles = meshData.triangles;
+            uvs = meshData.uvs;
+            colliderVertices = meshData.colliderVertices;
+            colliderTriangles = meshData.colliderTriangles;
         }
 
         #endregion
 
-        #region Add Vertex
+        #region Add Single Point(s)
 
+        /// <summary>
+        /// Add a vertex with the given components to the mesh data
+        /// </summary>
+        /// <param name="x">The x component</param>
+        /// <param name="y">The y component</param>
+        /// <param name="z">The z component</param>
         public void AddVertex(float x, float y, float z)
         {
-            _vertices.Add(new Vector3(x, y, z));
+            vertices.Add(new Vector3(x, y, z));
         }
 
+        /// <summary>
+        /// Add a vertex to the mesh data
+        /// </summary>
+        /// <param name="vertex">The vertex to add</param>
         public void AddVertex(Vector3 vertex)
         {
-            _vertices.Add(vertex);
+            vertices.Add(vertex);
         }
 
+        /// <summary>
+        /// Add a vertex with the given components to the collider data
+        /// </summary>
+        /// <param name="x">The x component</param>
+        /// <param name="y">The y component</param>
+        /// <param name="z">The z component</param>
         public void AddVertexToCollider(float x, float y, float z)
         {
-            _colliderVertices.Add(new Vector3(x, y, z));
+            colliderVertices.Add(new Vector3(x, y, z));
         }
 
+        /// <summary>
+        /// Add a vertex to the collider data
+        /// </summary>
+        /// <param name="vertex">The vertex to add</param>
         public void AddVertexToCollider(Vector3 vertex)
         {
-            _colliderVertices.Add(vertex);
+            colliderVertices.Add(vertex);
         }
 
+        /// <summary>
+        /// Add a uv with the given components to the mesh data
+        /// </summary>
+        /// <param name="x">The x component</param>
+        /// <param name="y">The y component</param>
         public void AddUV(float x, float y)
         {
-            _uvs.Add(new Vector2(x, y));
+            uvs.Add(new Vector2(x, y));
         }
 
+        /// <summary>
+        /// Add a uv to the mesh data
+        /// </summary>
+        /// <param name="uv">The uv to add</param>
         public void AddUV(Vector2 uv)
         {
-            _uvs.Add(uv);
+            uvs.Add(uv);
         }
 
         #endregion
 
-        #region Add Triangle
+        #region Add Triangle(s)
 
+        /// <summary>
+        /// Add a triangle to mesh data using vertex indices
+        /// </summary>
+        /// <param name="i1">Vertex index 1</param>
+        /// <param name="i2">Vertex index 2</param>
+        /// <param name="i3">Vertex index 3</param>
+        /// <param name="subMesh">The submesh to add the triangle to</param>
         public void AddTriangle(int i1, int i2, int i3, int subMesh)
         {
-            _triangles[subMesh].Add(i1);
-            _triangles[subMesh].Add(i2);
-            _triangles[subMesh].Add(i3);
+            triangles[subMesh].Add(i1);
+            triangles[subMesh].Add(i2);
+            triangles[subMesh].Add(i3);
         }
 
+        /// <summary>
+        /// Add a triangle to the mesh data using vertex positions
+        /// </summary>
+        /// <param name="v1">Vertex 1</param>
+        /// <param name="v2">Vertex 2</param>
+        /// <param name="v3">Vertex 3</param>
+        /// <param name="subMesh">The submesh to add the triangle to</param>
         public void AddTriangle(Vector3 v1, Vector3 v2, Vector3 v3, int subMesh)
         {
-            _vertices.Add(v1);
-            _vertices.Add(v2);
-            _vertices.Add(v3);
+            vertices.Add(v1);
+            vertices.Add(v2);
+            vertices.Add(v3);
 
-            var tris = _triangles[subMesh];
-            tris.Add(_vertices.Count - 3);
-            tris.Add(_vertices.Count - 2);
-            tris.Add(_vertices.Count - 1);
+            var tris = triangles[subMesh];
+            tris.Add(vertices.Count - 3);
+            tris.Add(vertices.Count - 2);
+            tris.Add(vertices.Count - 1);
         }
 
+        /// <summary>
+        /// Add a triangle to collider data using vertex indices
+        /// </summary>
+        /// <param name="i1">Vertex index 1</param>
+        /// <param name="i2">Vertex index 2</param>
+        /// <param name="i3">Vertex index 3</param>
         public void AddTriangleToCollider(int i1, int i2, int i3)
         {
-            _colliderTriangles.Add(i1);
-            _colliderTriangles.Add(i2);
-            _colliderTriangles.Add(i3);
+            colliderTriangles.Add(i1);
+            colliderTriangles.Add(i2);
+            colliderTriangles.Add(i3);
         }
 
-        public void AddTriangleToColliders(Vector3 v1, Vector3 v2, Vector3 v3)
+        /// <summary>
+        /// Add a triangle to the collider data using vertex positions
+        /// </summary>
+        /// <param name="v1">Vertex 1</param>
+        /// <param name="v2">Vertex 2</param>
+        /// <param name="v3">Vertex 3</param>
+        public void AddTriangleToCollider(Vector3 v1, Vector3 v2, Vector3 v3)
         {
-            _colliderVertices.Add(v1);
-            _colliderVertices.Add(v2);
-            _colliderVertices.Add(v3);
+            colliderVertices.Add(v1);
+            colliderVertices.Add(v2);
+            colliderVertices.Add(v3);
 
-            _colliderTriangles.Add(_colliderVertices.Count - 3);
-            _colliderTriangles.Add(_colliderVertices.Count - 2);
-            _colliderTriangles.Add(_colliderVertices.Count - 1);
-        }
-
-        public void AddTriangleUVs(Vector2 uv1, Vector2 uv2, Vector2 uv3)
-        {
-            // TODO: Test this function
-            _uvs.Add(uv1);
-            _uvs.Add(uv2);
-            _uvs.Add(uv3);
+            colliderTriangles.Add(colliderVertices.Count - 3);
+            colliderTriangles.Add(colliderVertices.Count - 2);
+            colliderTriangles.Add(colliderVertices.Count - 1);
         }
 
         #endregion
 
         #region Add Quad
 
+        /// <summary>
+        /// Add a quad to the mesh data using vertex positions
+        /// </summary>
+        /// <param name="v1">Vertex 1</param>
+        /// <param name="v2">Vertex 2</param>
+        /// <param name="v3">Vertex 3</param>
+        /// <param name="v4">Vertex 4</param>
+        /// <param name="subMesh">The submesh to add the quad to</param>
+        public void AddQuad(Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, int submesh)
+        {
+            vertices.Add(v1);
+            vertices.Add(v2);
+            vertices.Add(v3);
+            vertices.Add(v4);
+
+            AddQuadTriangles(submesh);
+        }
+
+        /// <summary>
+        /// Add a quad to the mesh data using a position, size and normal direction
+        /// </summary>
+        /// <param name="position">The position to add the quad (offset for face is added automatically)</param>
+        /// <param name="dir">The direction of the face</param>
+        /// <param name="size">The size of the face (half the width)</param>
+        /// <param name="subMesh">The submesh to add the quad to</param>
         public void AddQuad(Vector3 position, OrdinalDirections dir, float size, int submesh)
         {
+            var ps = +size;
+            var ns = -size;
             switch (dir)
             {
-                case OrdinalDirections.North:
-                    _vertices.Add(position + new Vector3(+size, -size, 0));
-                    _vertices.Add(position + new Vector3(+size, +size, 0));
-                    _vertices.Add(position + new Vector3(-size, +size, 0));
-                    _vertices.Add(position + new Vector3(-size, -size, 0));
-                    break;
-                case OrdinalDirections.South:
-                    _vertices.Add(position + new Vector3(-size, -size, 0));
-                    _vertices.Add(position + new Vector3(-size, +size, 0));
-                    _vertices.Add(position + new Vector3(+size, +size, 0));
-                    _vertices.Add(position + new Vector3(+size, -size, 0));
-                    break;
-                case OrdinalDirections.East:
-                    _vertices.Add(position + new Vector3(0, -size, -size));
-                    _vertices.Add(position + new Vector3(0, +size, -size));
-                    _vertices.Add(position + new Vector3(0, +size, +size));
-                    _vertices.Add(position + new Vector3(0, -size, +size));
-                    break;
-                case OrdinalDirections.West:
-                    _vertices.Add(position + new Vector3(0, -size, +size));
-                    _vertices.Add(position + new Vector3(0, +size, +size));
-                    _vertices.Add(position + new Vector3(0, +size, -size));
-                    _vertices.Add(position + new Vector3(0, -size, -size));
-                    break;
                 case OrdinalDirections.Up:
-                    _vertices.Add(position + new Vector3(-size, 0, +size));
-                    _vertices.Add(position + new Vector3(+size, 0, +size));
-                    _vertices.Add(position + new Vector3(+size, 0, -size));
-                    _vertices.Add(position + new Vector3(-size, 0, -size));
+                    vertices.Add(position + new Vector3(ns, ps, ps));
+                    vertices.Add(position + new Vector3(ps, ps, ps));
+                    vertices.Add(position + new Vector3(ps, ps, ns));
+                    vertices.Add(position + new Vector3(ns, ps, ns));
                     break;
                 case OrdinalDirections.Down:
-                    _vertices.Add(position + new Vector3(-size, 0, -size));
-                    _vertices.Add(position + new Vector3(+size, 0, -size));
-                    _vertices.Add(position + new Vector3(+size, 0, +size));
-                    _vertices.Add(position + new Vector3(-size, 0, +size));
+                    vertices.Add(position + new Vector3(ns, ns, ns));
+                    vertices.Add(position + new Vector3(ps, ns, ns));
+                    vertices.Add(position + new Vector3(ps, ns, ps));
+                    vertices.Add(position + new Vector3(ns, ns, ps));
+                    break;
+                case OrdinalDirections.North:
+                    vertices.Add(position + new Vector3(ps, ns, ps));
+                    vertices.Add(position + new Vector3(ps, ps, ps));
+                    vertices.Add(position + new Vector3(ns, ps, ps));
+                    vertices.Add(position + new Vector3(ns, ns, ps));
+                    break;
+                case OrdinalDirections.East:
+                    vertices.Add(position + new Vector3(ps, ns, ns));
+                    vertices.Add(position + new Vector3(ps, ps, ns));
+                    vertices.Add(position + new Vector3(ps, ps, ps));
+                    vertices.Add(position + new Vector3(ps, ns, ps));
+                    break;
+                case OrdinalDirections.South:
+                    vertices.Add(position + new Vector3(ns, ns, ns));
+                    vertices.Add(position + new Vector3(ns, ps, ns));
+                    vertices.Add(position + new Vector3(ps, ps, ns));
+                    vertices.Add(position + new Vector3(ps, ns, ns));
+                    break;
+                case OrdinalDirections.West:
+                    vertices.Add(position + new Vector3(ns, ns, ps));
+                    vertices.Add(position + new Vector3(ns, ps, ps));
+                    vertices.Add(position + new Vector3(ns, ps, ns));
+                    vertices.Add(position + new Vector3(ns, ns, ns));
                     break;
                 default:
                     break;
@@ -189,45 +270,68 @@ namespace Voxic.Meshing
             AddQuadTriangles(submesh);
         }
 
+        /// <summary>
+        /// Add a quad to the mesh collider using vertex positions
+        /// </summary>
+        /// <param name="v1">Vertex 1</param>
+        /// <param name="v2">Vertex 2</param>
+        /// <param name="v3">Vertex 3</param>
+        /// <param name="v4">Vertex 4</param>
+        public void AddQuadToCollider(Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4)
+        {
+            colliderVertices.Add(v1);
+            colliderVertices.Add(v2);
+            colliderVertices.Add(v3);
+            colliderVertices.Add(v4);
+
+            AddQuadTrianglesToCollider();
+        }
+
+        /// <summary>
+        /// Add a quad to the collider data using a position, size and normal direction
+        /// </summary>
+        /// <param name="position">The position to add the quad (offset for face is added automatically)</param>
+        /// <param name="dir">The direction of the face</param>
+        /// <param name="size">The size of the face (half the width)</param>
         public void AddQuadToCollider(Vector3 position, OrdinalDirections dir, float size)
         {
             switch (dir)
             {
                 case OrdinalDirections.North:
-                    _colliderVertices.Add(position + new Vector3(+size, -size, 0));
-                    _colliderVertices.Add(position + new Vector3(+size, +size, 0));
-                    _colliderVertices.Add(position + new Vector3(-size, +size, 0));
-                    _colliderVertices.Add(position + new Vector3(-size, -size, 0));
+                    colliderVertices.Add(position + new Vector3(+size, -size, +size));
+                    colliderVertices.Add(position + new Vector3(+size, +size, +size));
+                    colliderVertices.Add(position + new Vector3(-size, +size, +size));
+                    colliderVertices.Add(position + new Vector3(-size, -size, +size));
                     break;
                 case OrdinalDirections.South:
-                    _colliderVertices.Add(position + new Vector3(-size, -size, 0));
-                    _colliderVertices.Add(position + new Vector3(-size, +size, 0));
-                    _colliderVertices.Add(position + new Vector3(+size, +size, 0));
-                    _colliderVertices.Add(position + new Vector3(+size, -size, 0));
+                    colliderVertices.Add(position + new Vector3(-size, -size, -size));
+                    colliderVertices.Add(position + new Vector3(-size, +size, -size));
+                    colliderVertices.Add(position + new Vector3(+size, +size, -size));
+                    colliderVertices.Add(position + new Vector3(+size, -size, -size));
                     break;
                 case OrdinalDirections.East:
-                    _colliderVertices.Add(position + new Vector3(0, -size, -size));
-                    _colliderVertices.Add(position + new Vector3(0, +size, -size));
-                    _colliderVertices.Add(position + new Vector3(0, +size, +size));
-                    _colliderVertices.Add(position + new Vector3(0, -size, +size));
+                    colliderVertices.Add(position + new Vector3(+size, -size, -size));
+                    colliderVertices.Add(position + new Vector3(+size, +size, -size));
+                    colliderVertices.Add(position + new Vector3(+size, +size, +size));
+                    colliderVertices.Add(position + new Vector3(+size, -size, +size));
                     break;
                 case OrdinalDirections.West:
-                    _colliderVertices.Add(position + new Vector3(0, -size, +size));
-                    _colliderVertices.Add(position + new Vector3(0, +size, +size));
-                    _colliderVertices.Add(position + new Vector3(0, +size, -size));
-                    _colliderVertices.Add(position + new Vector3(0, -size, -size));
+                    colliderVertices.Add(position + new Vector3(-size, -size, +size));
+                    colliderVertices.Add(position + new Vector3(-size, +size, +size));
+                    colliderVertices.Add(position + new Vector3(-size, +size, -size));
+                    colliderVertices.Add(position + new Vector3(-size, -size, -size));
                     break;
                 case OrdinalDirections.Up:
-                    _colliderVertices.Add(position + new Vector3(-size, 0, +size));
-                    _colliderVertices.Add(position + new Vector3(+size, 0, +size));
-                    _colliderVertices.Add(position + new Vector3(+size, 0, -size));
-                    _colliderVertices.Add(position + new Vector3(-size, 0, -size));
+                    colliderVertices.Add(position + new Vector3(-size, +size, +size));
+                    colliderVertices.Add(position + new Vector3(+size, +size, +size));
+                    colliderVertices.Add(position + new Vector3(+size, +size, -size));
+                    colliderVertices.Add(position + new Vector3(-size, +size, -size));
                     break;
                 case OrdinalDirections.Down:
-                    _colliderVertices.Add(position + new Vector3(-size, 0, -size));
-                    _colliderVertices.Add(position + new Vector3(+size, 0, -size));
-                    _colliderVertices.Add(position + new Vector3(+size, 0, +size));
-                    _colliderVertices.Add(position + new Vector3(-size, 0, +size));
+                    colliderVertices.Add(position + new Vector3(-size, -size, -size));
+                    colliderVertices.Add(position + new Vector3(+size, -size, -size));
+                    colliderVertices.Add(position + new Vector3(+size, -size, +size));
+                    colliderVertices.Add(position + new Vector3(-size, -size, +size));
                     break;
                 default:
                     break;
@@ -236,42 +340,55 @@ namespace Voxic.Meshing
             AddQuadTrianglesToCollider();
         }
 
-        private void AddQuadTriangles(int subMesh)
+        /// <summary>
+        /// Add triangle information for the last four vertices to form a quad in the mesh data
+        /// </summary>
+        /// <param name="subMesh">The submesh to add the quad to</param>
+        public void AddQuadTriangles(int subMesh)
         {
-            AddTriangle(_vertices.Count - 4, _vertices.Count - 3, _vertices.Count - 2, subMesh);
-            AddTriangle(_vertices.Count - 4, _vertices.Count - 2, _vertices.Count - 1, subMesh);
+            AddTriangle(vertices.Count - 4, vertices.Count - 3, vertices.Count - 2, subMesh);
+            AddTriangle(vertices.Count - 4, vertices.Count - 2, vertices.Count - 1, subMesh);
         }
 
-        private void AddQuadTrianglesToCollider()
+        /// <summary>
+        /// Add triangle information for the last four vertices to form a quad in the collider data
+        /// </summary>
+        public void AddQuadTrianglesToCollider()
         {
-            AddTriangleToCollider(_colliderVertices.Count - 4, _colliderVertices.Count - 3, _colliderVertices.Count - 2);
-            AddTriangleToCollider(_colliderVertices.Count - 4, _colliderVertices.Count - 2, _colliderVertices.Count - 1);
+            AddTriangleToCollider(colliderVertices.Count - 4, colliderVertices.Count - 3, colliderVertices.Count - 2);
+            AddTriangleToCollider(colliderVertices.Count - 4, colliderVertices.Count - 2, colliderVertices.Count - 1);
         }
 
+        /// <summary>
+        /// Add uv data for the last four vertices in the mesh data from a rectangle
+        /// </summary>
+        /// <param name="uv">The uv rect information</param>
+        /// <param name="dir">The direction to add the uvs</param>
         public void AddQuadUVs(Rect uv, OrdinalDirections dir)
         {
+            // TODO: Consider simplifying this method
             switch (dir)
             {
                 case OrdinalDirections.Up:
-                    _uvs.Add(uv.position + new Vector2(0, uv.height));
-                    _uvs.Add(uv.position + uv.size);
-                    _uvs.Add(uv.position + new Vector2(uv.width, 0));
-                    _uvs.Add(uv.position);
+                    uvs.Add(uv.position + new Vector2(0, uv.height));
+                    uvs.Add(uv.position + uv.size);
+                    uvs.Add(uv.position + new Vector2(uv.width, 0));
+                    uvs.Add(uv.position);
                     break;
                 case OrdinalDirections.Down:
-                    _uvs.Add(uv.position + new Vector2(uv.width, 0));
-                    _uvs.Add(uv.position);
-                    _uvs.Add(uv.position + new Vector2(0, uv.height));
-                    _uvs.Add(uv.position + uv.size);
+                    uvs.Add(uv.position + new Vector2(uv.width, 0));
+                    uvs.Add(uv.position);
+                    uvs.Add(uv.position + new Vector2(0, uv.height));
+                    uvs.Add(uv.position + uv.size);
                     break;
                 case OrdinalDirections.North:
                 case OrdinalDirections.East:
                 case OrdinalDirections.South:
                 case OrdinalDirections.West:
-                    _uvs.Add(uv.position);
-                    _uvs.Add(uv.position + new Vector2(0, uv.height));
-                    _uvs.Add(uv.position + uv.size);
-                    _uvs.Add(uv.position + new Vector2(uv.width, 0));
+                    uvs.Add(uv.position);
+                    uvs.Add(uv.position + new Vector2(0, uv.height));
+                    uvs.Add(uv.position + uv.size);
+                    uvs.Add(uv.position + new Vector2(uv.width, 0));
                     break;
                 default:
                     break;
@@ -282,15 +399,19 @@ namespace Voxic.Meshing
 
         #region To Mesh
 
+        /// <summary>
+        /// Create a Mesh from the mesh data
+        /// </summary>
+        /// <returns></returns>
         public Mesh CreateMesh()
         {
             Mesh mesh = new Mesh();
-            mesh.vertices = _vertices.ToArray();
-            for (int i = 0; i < _triangles.Length; i++)
+            mesh.vertices = vertices.ToArray();
+            for (int i = 0; i < triangles.Length; i++)
             {
-                mesh.SetTriangles(_triangles[i].ToArray(), i);
+                mesh.SetTriangles(triangles[i].ToArray(), i);
             }
-            mesh.uv = _uvs.ToArray();
+            mesh.uv = uvs.ToArray();
 
             mesh.RecalculateBounds();
             mesh.RecalculateNormals();
@@ -298,11 +419,15 @@ namespace Voxic.Meshing
             return mesh;
         }
 
+        /// <summary>
+        /// Create a Mesh from the collider data
+        /// </summary>
+        /// <returns></returns>
         public Mesh CreateColliderMesh()
         {
             Mesh mesh = new Mesh();
-            mesh.vertices = _colliderVertices.ToArray();
-            mesh.triangles = _colliderTriangles.ToArray();
+            mesh.vertices = colliderVertices.ToArray();
+            mesh.triangles = colliderTriangles.ToArray();
 
             mesh.RecalculateBounds();
             mesh.RecalculateNormals();
@@ -312,14 +437,17 @@ namespace Voxic.Meshing
 
         #endregion
 
+        /// <summary>
+        /// Clear the mesh data
+        /// </summary>
         public void Clear()
         {
-            _vertices.Clear();
-            for (int i = 0; i < _triangles.Length; i++)
-                _triangles[i].Clear();
-            _uvs.Clear();
-            _colliderVertices.Clear();
-            _colliderTriangles.Clear();
+            vertices.Clear();
+            for (int i = 0; i < triangles.Length; i++)
+                triangles[i].Clear();
+            uvs.Clear();
+            colliderVertices.Clear();
+            colliderTriangles.Clear();
         }
     }
 }

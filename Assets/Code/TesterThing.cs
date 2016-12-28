@@ -6,38 +6,55 @@ using Voxic.Math;
 using Voxic.Rendering;
 using Voxic.Worlds;
 
+// TODO: Remove/Extract functionality from this class
 public class TesterThing : MonoBehaviour
 {
     public List<ChunkRenderer> chunks = new List<ChunkRenderer>();
 
     public Object ChunkPrefab;
+    public GameObject chunkContainer;
 
     private World world;
 
-    private void Awake()
+    private void OnEnable()
     {
+        Debug.Log("Tester Thing Started");
+        CreateChunkContainer();
+
         WorldSettings settings = new WorldSettings(16, 1);
         world = new World(settings);
         StartCoroutine(CreateChunks());
     }
 
-    private void Update()
+    private void CreateChunkContainer()
     {
+        chunkContainer = null;
+        chunkContainer = GameObject.Find("Chunk Container");
+        if (chunkContainer != null)
+        {
+            Destroy(chunkContainer);
+            chunks.Clear();
+        }
+        chunkContainer = new GameObject("Chunk Container");
     }
 
+    private bool done = false;
     private string message = "";
     private System.DateTime startTime = System.DateTime.MinValue;
     private void OnGUI()
     {
-        if (startTime != System.DateTime.MinValue)
-            GUI.Label(new Rect(0, 0, 1000, 100), string.Format("Elapsed Time (s): {0}\n{1}", (System.DateTime.Now - startTime).TotalSeconds, message));
+        if (!done)
+            GUI.Label(new Rect(0, 20, 1000, 100), string.Format("Elapsed Time (s): {0}\n{1}", (System.DateTime.Now - startTime).TotalSeconds, message));
+        else
+            GUI.Label(new Rect(0, 20, 1000, 100), string.Format("{0}", message));
     }
 
     private IEnumerator CreateChunks()
     {
         startTime = System.DateTime.Now;
+        done = false;
 
-        int s = 5;
+        int s = 0;
         for (int i = -s; i <= s; i++)
         {
             for (int k = -s; k <= s; k++)
@@ -58,6 +75,7 @@ public class TesterThing : MonoBehaviour
         }
 
         message = string.Format("Completed in (s): {0}\nChunks: {1}\nVoxels: {2}", (System.DateTime.Now - startTime).TotalSeconds, (2 * s + 1) * (2 * s + 1), (2 * s + 1) * (2 * s + 1) * 16 * 16 * 16);
+        done = true;
     }
 
     private void CreateChunk(IntVector3 chunkPos)
@@ -69,6 +87,7 @@ public class TesterThing : MonoBehaviour
         ChunkRenderer cr = crObj.GetComponent<ChunkRenderer>();
         chunks.Add(cr);
 
+        crObj.transform.parent = chunkContainer.transform;
         cr.SetChunk(chunk);
     }
 }

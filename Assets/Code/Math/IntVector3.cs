@@ -3,22 +3,22 @@
 namespace Voxic.Math
 {
     /// <summary>
-    /// Class to represent integer based vectors
+    /// Data to represent integer based vectors
     /// </summary>
     public struct IntVector3
     {
         /// <summary>
         /// The x component
         /// </summary>
-        public int X { get; private set; }
+        public int X;
         /// <summary>
         /// The y component
         /// </summary>
-        public int Y { get; private set; }
+        public int Y;
         /// <summary>
         /// The z component
         /// </summary>
-        public int Z { get; private set; }
+        public int Z;
 
         /// <summary>
         /// Create a new IntVector3 with the given components
@@ -124,6 +124,19 @@ namespace Voxic.Math
                 (int)v3.x,
                 (int)v3.y,
                 (int)v3.z);
+        }
+
+        /// <summary>
+        /// Convert from Vector3 to IntVector3 (rounds)
+        /// </summary>
+        /// <param name="v3">The Vector3 to convert</param>
+        /// <returns></returns>
+        public static IntVector3 RoundFromVector3(Vector3 v3)
+        {
+            return new IntVector3(
+                Mathf.RoundToInt(v3.x),
+                Mathf.RoundToInt(v3.y),
+                Mathf.RoundToInt(v3.z));
         }
 
         #endregion

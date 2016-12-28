@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using System.Threading;
 using UnityEngine;
 using Voxic.Chunks;
 using Voxic.Math;
 using Voxic.Meshing;
-using Voxic.Voxels;
 
 namespace Voxic.Rendering
 {
@@ -67,6 +64,9 @@ namespace Voxic.Rendering
             Chunk = chunk;
         }
 
+        /// <summary>
+        /// Asynchronously render the chunk in the world
+        /// </summary>
         public void RenderChunkAsync()
         {
             if (Chunk == null)
@@ -75,17 +75,52 @@ namespace Voxic.Rendering
             StartCoroutine(RenderChunkCoroutine());
         }
 
+        /// <summary>
+        /// Render chunk coroutine
+        /// </summary>
+        /// <returns></returns>
         private IEnumerator RenderChunkCoroutine()
         {
+            // Prepare the chunk
             Thread thread = new Thread(PrepareMeshDataAsync);
             thread.Start();
+
+            // Wait
             while (thread.IsAlive)
             {
                 yield return new WaitForEndOfFrame();
             }
+
+            // Render the thread
             RenderChunkMesh();
         }
 
+        /// <summary>
+        /// Prepare the mesh data for rendering
+        /// </summary>
+        private void PrepareMeshDataAsync()
+        {
+            meshData.Clear();
+            IntVector3 position;
+            try
+            {
+                for (int i = 0; i < Chunk.World.WorldSettings.ChunkSizeInVoxels; i++)
+                    for (int j = 0; j < Chunk.World.WorldSettings.ChunkSizeInVoxels; j++)
+                        for (int k = 0; k < Chunk.World.WorldSettings.ChunkSizeInVoxels; k++)
+                        {
+                            position = new IntVector3(i, j, k);
+                            Chunk.Voxels[i, j, k].AddMeshData(meshData, Chunk, position, (Vector3)position, Chunk.World.WorldSettings.HalfVoxelSizeInUnits);
+                        }
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogException(ex);
+            }
+        }
+
+        /// <summary>
+        /// Render the chunk mesh data
+        /// </summary>
         private void RenderChunkMesh()
         {
             if (MeshMode != MeshingModes.ColliderOnly)
@@ -93,19 +128,6 @@ namespace Voxic.Rendering
 
             if (MeshMode != MeshingModes.MeshOnly)
                 meshCollider.sharedMesh = meshData.CreateColliderMesh();
-        }
-
-        private void PrepareMeshDataAsync()
-        {
-            meshData.Clear();
-            IntVector3 position;
-            for (int i = 0; i < Chunk.World.WorldSettings.ChunkSizeInVoxels; i++)
-                for (int j = 0; j < Chunk.World.WorldSettings.ChunkSizeInVoxels; j++)
-                    for (int k = 0; k < Chunk.World.WorldSettings.ChunkSizeInVoxels; k++)
-                    {
-                        position = new IntVector3(i, j, k);
-                        Chunk.Voxels[i, j, k].VoxelData.AddMeshData(meshData, Chunk, (Vector3)position, position, Chunk.World.WorldSettings.HalfVoxelSizeInUnits);
-                    }
         }
     }
 }
