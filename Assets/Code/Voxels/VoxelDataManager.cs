@@ -12,8 +12,8 @@ namespace Voxic.Voxels
         public static VoxelData GrassVoxelData = new VoxelData(new VoxelDataID(0), "Grass").SetTextures(new VoxelDataTextures(0, 3) { UpY = 1 });
         public static VoxelData RotatoVoxelData = new VoxelData(new VoxelDataID(0), "Rotato").SetTextures(new VoxelDataTextures(0, 3)
         {
-            UpY = 1,
-            UpX = 0,
+            UpY = 5,
+            UpX = 1,
 
             DownX = 1,
             DownY = 0,

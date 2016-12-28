@@ -4,7 +4,7 @@ using UnityEngine;
 using Voxic.Chunks;
 using Voxic.Math;
 using Voxic.Rendering;
-using Voxic.Worlds;
+using Voxic.VoxelObjects;
 
 // TODO: Remove/Extract functionality from this class
 public class TesterThing : MonoBehaviour
@@ -14,15 +14,15 @@ public class TesterThing : MonoBehaviour
     public Object ChunkPrefab;
     public GameObject chunkContainer;
 
-    private World world;
+    private VoxelObject voxelObject;
 
     private void OnEnable()
     {
         Debug.Log("Tester Thing Started");
         CreateChunkContainer();
 
-        WorldSettings settings = new WorldSettings(16, 1);
-        world = new World(settings);
+        VoxelObjectSettings settings = new VoxelObjectSettings(16, 1);
+        voxelObject = new VoxelObject(settings);
         StartCoroutine(CreateChunks());
     }
 
@@ -54,7 +54,7 @@ public class TesterThing : MonoBehaviour
         startTime = System.DateTime.Now;
         done = false;
 
-        int s = 0;
+        int s = 5;
         for (int i = -s; i <= s; i++)
         {
             for (int k = -s; k <= s; k++)
@@ -80,10 +80,10 @@ public class TesterThing : MonoBehaviour
 
     private void CreateChunk(IntVector3 chunkPos)
     {
-        Chunk chunk = world.LoadChunk(chunkPos);
+        Chunk chunk = voxelObject.LoadChunk(chunkPos);
 
         // Instantiate chunk renderer
-        GameObject crObj = (GameObject)Instantiate(ChunkPrefab, (Vector3)world.PosHelper.ChunkToWorldPosition(chunk.ChunkPosition), Quaternion.identity);
+        GameObject crObj = (GameObject)Instantiate(ChunkPrefab, (Vector3)voxelObject.PosHelper.ChunkToObjectPosition(chunk.ChunkPosition), Quaternion.identity);
         ChunkRenderer cr = crObj.GetComponent<ChunkRenderer>();
         chunks.Add(cr);
 

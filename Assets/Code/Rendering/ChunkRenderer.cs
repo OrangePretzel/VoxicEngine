@@ -65,7 +65,7 @@ namespace Voxic.Rendering
         }
 
         /// <summary>
-        /// Asynchronously render the chunk in the world
+        /// Asynchronously render the chunk in the voxel object
         /// </summary>
         public void RenderChunkAsync()
         {
@@ -104,12 +104,12 @@ namespace Voxic.Rendering
             IntVector3 position;
             try
             {
-                for (int i = 0; i < Chunk.World.WorldSettings.ChunkSizeInVoxels; i++)
-                    for (int j = 0; j < Chunk.World.WorldSettings.ChunkSizeInVoxels; j++)
-                        for (int k = 0; k < Chunk.World.WorldSettings.ChunkSizeInVoxels; k++)
+                for (int i = 0; i < Chunk.VoxelObject.Settings.ChunkSizeInVoxels; i++)
+                    for (int j = 0; j < Chunk.VoxelObject.Settings.ChunkSizeInVoxels; j++)
+                        for (int k = 0; k < Chunk.VoxelObject.Settings.ChunkSizeInVoxels; k++)
                         {
                             position = new IntVector3(i, j, k);
-                            Chunk.Voxels[i, j, k].AddMeshData(meshData, Chunk, position, (Vector3)position, Chunk.World.WorldSettings.HalfVoxelSizeInUnits);
+                            Chunk.Voxels[i, j, k].AddMeshData(meshData, Chunk, position, (Vector3)position, Chunk.VoxelObject.Settings.HalfVoxelSizeInUnits);
                         }
             }
             catch (System.Exception ex)

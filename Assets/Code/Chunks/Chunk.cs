@@ -1,21 +1,21 @@
 ﻿using UnityEngine;
 using Voxic.Math;
 using Voxic.Voxels;
-using Voxic.Worlds;
+using Voxic.VoxelObjects;
 
 namespace Voxic.Chunks
 {
     /// <summary>
-    /// Class representing chunks of voxel data within the world
+    /// Class representing chunks of voxel data within a voxel object
     /// </summary>
     public class Chunk
     {
         /// <summary>
-        /// The world the chunk belongs to
+        /// The voxel object the chunk belongs to
         /// </summary>
-        public World World { get; private set; }
+        public VoxelObject VoxelObject { get; private set; }
         /// <summary>
-        /// The position of the chunk in the world
+        /// The position of the chunk in the voxel object
         /// </summary>
         public IntVector3 ChunkPosition { get; private set; }
 
@@ -32,13 +32,13 @@ namespace Voxic.Chunks
         #region Constructor
 
         /// <summary>
-        /// Create a new chunk for the given world at the given chunk position
+        /// Create a new chunk for the given voxel object at the given chunk position
         /// </summary>
-        /// <param name="world">The world</param>
+        /// <param name="voxObj">The voxel object</param>
         /// <param name="chunkPosition">The position of the chunk</param>
-        public Chunk(World world, IntVector3 chunkPosition)
+        public Chunk(VoxelObject voxObj, IntVector3 chunkPosition)
         {
-            World = world;
+            VoxelObject = voxObj;
             ChunkPosition = chunkPosition;
 
             // Create voxels
@@ -50,8 +50,8 @@ namespace Voxic.Chunks
         /// </summary>
         private void CreateVoxels()
         {
-            int chunkSize = World.WorldSettings.ChunkSizeInVoxels;
-            voxels = new Voxel[World.WorldSettings.ChunkSizeInVoxels, World.WorldSettings.ChunkSizeInVoxels, World.WorldSettings.ChunkSizeInVoxels];
+            int chunkSize = VoxelObject.Settings.ChunkSizeInVoxels;
+            voxels = new Voxel[VoxelObject.Settings.ChunkSizeInVoxels, VoxelObject.Settings.ChunkSizeInVoxels, VoxelObject.Settings.ChunkSizeInVoxels];
             for (int i = 0; i < chunkSize; i++)
                 for (int k = 0; k < chunkSize; k++)
                     for (int j = 0; j < chunkSize; j++)
@@ -59,9 +59,10 @@ namespace Voxic.Chunks
                         Voxels[i, j, k] = new Voxel(VoxelDataManager.NULL_VOXEL_DATA);
                     }
 
-            // TODO: Extract world generation from this method
-            //DoChunkyThings(chunkSize);
-            DoTestyThings();
+            // TODO: Extract object generation from this method
+            //Random.InitState(1370);
+            DoChunkyThings(chunkSize);
+            //DoTestyThings();
         }
 
         private void DoTestyThings()
@@ -80,8 +81,6 @@ namespace Voxic.Chunks
 
         private void DoChunkyThings(int chunkSize)
         {
-            Random.InitState(1370);
-
             int[,] hMap = new int[chunkSize, chunkSize];
             int[,] dMap = new int[chunkSize, chunkSize];
             for (int i = 0; i < chunkSize; i++)
@@ -135,7 +134,7 @@ namespace Voxic.Chunks
                         int h = hMap[i, k];
                         int d = dMap[i, k];
                         if (j == h && j >= d)
-                            vox = new ComplexVoxel(VoxelDataManager.RotatoVoxelData);
+                            vox = new ComplexVoxel(VoxelDataManager.GrassVoxelData);
                         else if (j < h && j >= h - 2 && j >= d)
                             vox = new ComplexVoxel(VoxelDataManager.DirtVoxelData);
                         else if (j < h - 2 && j >= d)
@@ -168,7 +167,7 @@ namespace Voxic.Chunks
             }
             else
             {
-                return World.IsSolid(World.PosHelper.ChunkToWorldPosition(ChunkPosition) + localPos, dir);
+                return VoxelObject.IsSolid(VoxelObject.PosHelper.ChunkToObjectPosition(ChunkPosition) + localPos, dir);
             }
         }
 
@@ -188,7 +187,7 @@ namespace Voxic.Chunks
             }
             else
             {
-                return World.IsSolid(World.PosHelper.ChunkToWorldPosition(ChunkPosition) + new IntVector3(lX, lY, lZ), dir);
+                return VoxelObject.IsSolid(VoxelObject.PosHelper.ChunkToObjectPosition(ChunkPosition) + new IntVector3(lX, lY, lZ), dir);
             }
         }
 
@@ -205,7 +204,7 @@ namespace Voxic.Chunks
         /// <returns></returns>
         public bool IsInChunk(int lX, int lY, int lZ)
         {
-            return (lX >= 0 && lX < World.WorldSettings.ChunkSizeInVoxels) && (lY >= 0 && lY < World.WorldSettings.ChunkSizeInVoxels) && (lZ >= 0 && lZ < World.WorldSettings.ChunkSizeInVoxels);
+            return (lX >= 0 && lX < VoxelObject.Settings.ChunkSizeInVoxels) && (lY >= 0 && lY < VoxelObject.Settings.ChunkSizeInVoxels) && (lZ >= 0 && lZ < VoxelObject.Settings.ChunkSizeInVoxels);
         }
 
         /// <summary>
@@ -215,7 +214,7 @@ namespace Voxic.Chunks
         /// <returns></returns>
         public bool IsInChunk(IntVector3 localPosition)
         {
-            return (localPosition.X >= 0 && localPosition.X < World.WorldSettings.ChunkSizeInVoxels) && (localPosition.Y >= 0 && localPosition.Y < World.WorldSettings.ChunkSizeInVoxels) && (localPosition.Z >= 0 && localPosition.Z < World.WorldSettings.ChunkSizeInVoxels);
+            return (localPosition.X >= 0 && localPosition.X < VoxelObject.Settings.ChunkSizeInVoxels) && (localPosition.Y >= 0 && localPosition.Y < VoxelObject.Settings.ChunkSizeInVoxels) && (localPosition.Z >= 0 && localPosition.Z < VoxelObject.Settings.ChunkSizeInVoxels);
         }
 
         #endregion

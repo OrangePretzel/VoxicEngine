@@ -3,45 +3,44 @@ using Voxic.Chunks;
 using Voxic.Math;
 using Voxic.Voxels;
 
-namespace Voxic.Worlds
+namespace Voxic.VoxelObjects
 {
-    // TODO: Comment this code
     /// <summary>
-    /// Class representing a voxel world
+    /// Class representing a voxel object
     /// </summary>
-    public class World
+    public class VoxelObject
     {
         /// <summary>
-        /// The settings for creating/rendering a voxel world
+        /// The settings for creating/rendering a voxel object
         /// </summary>
-        public WorldSettings WorldSettings { get; private set; }
+        public VoxelObjectSettings Settings { get; private set; }
         /// <summary>
         /// The position helper for translating coordinates
         /// </summary>
         public PositionHelper PosHelper { get; private set; }
         /// <summary>
-        /// The voxel data manager for the world
+        /// The voxel data manager for the object
         /// </summary>
         public VoxelDataManager VoxelDataManager { get; private set; }
 
         /// <summary>
-        /// The list of chunks loaded into the world
+        /// The list of chunks loaded into the object
         /// </summary>
         private Dictionary<IntVector3, Chunk> loadedChunks;
 
         /// <summary>
-        /// Create a new voxel world
+        /// Create a new voxel object
         /// </summary>
-        /// <param name="settings">The settings for the world</param>
-        public World(WorldSettings settings)
+        /// <param name="settings">The settings for the object</param>
+        public VoxelObject(VoxelObjectSettings settings)
         {
-            WorldSettings = settings;
+            Settings = settings;
             PosHelper = new PositionHelper(this);
             loadedChunks = new Dictionary<IntVector3, Chunk>();
         }
 
         /// <summary>
-        /// Load a chunk into the world at the given position
+        /// Load a chunk into the object at the given position
         /// </summary>
         /// <param name="chunkPos">The position of the chunk to load</param>
         /// <returns></returns>
@@ -99,32 +98,32 @@ namespace Voxic.Worlds
         }
 
         /// <summary>
-        /// Returns true if the position given is in the world
+        /// Returns true if the position given is in the object
         /// </summary>
-        /// <param name="worldPosition">The position to check</param>
+        /// <param name="objectPos">The position to check</param>
         /// <returns></returns>
-        public bool IsInWorldBoundary(IntVector3 worldPosition)
+        public bool IsInObjectBoundary(IntVector3 objectPos)
         {
-            // TODO: Implement this method to factor in world parameters
+            // TODO: Implement this method to factor in voxel object parameters
             return true;
         }
 
         /// <summary>
         /// Returns true if the given face of the voxel at the given position is solid
         /// </summary>
-        /// <param name="worldPosition">The position to check</param>
+        /// <param name="objPos">The position to check</param>
         /// <param name="dir">The face to check</param>
         /// <returns></returns>
-        public bool IsSolid(IntVector3 worldPosition, OrdinalDirections dir)
+        public bool IsSolid(IntVector3 objPos, OrdinalDirections dir)
         {
-            if (!IsInWorldBoundary(worldPosition))
+            if (!IsInObjectBoundary(objPos))
                 return false;
 
-            IntVector3 chunkPos = PosHelper.WorldToChunkPosition(worldPosition);
+            IntVector3 chunkPos = PosHelper.ObjectToChunkPosition(objPos);
             if (!IsChunkLoaded(chunkPos))
                 return false;
             else
-                return loadedChunks[chunkPos].IsSolid(PosHelper.WorldToLocalPosition(worldPosition), dir);
+                return loadedChunks[chunkPos].IsSolid(PosHelper.ObjectToLocalPosition(objPos), dir);
         }
     }
 }

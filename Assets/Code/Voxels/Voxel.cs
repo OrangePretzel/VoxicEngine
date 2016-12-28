@@ -6,7 +6,7 @@ using Voxic.Meshing;
 namespace Voxic.Voxels
 {
     /// <summary>
-    /// Class representing a single voxel in the world
+    /// Class representing a single voxel in a voxel object
     /// </summary>
     public class Voxel
     {
@@ -30,7 +30,7 @@ namespace Voxic.Voxels
         /// <param name="addToMeshData">The mesh to add the voxel to</param>
         /// <param name="chunk">The chunk the voxel is in</param>
         /// <param name="localPosition">The position in the chunk of the voxel</param>
-        /// <param name="position">The position in the world to render at</param>
+        /// <param name="position">The position in the scene to render at</param>
         /// <param name="voxelSize">The size of the voxel</param>
         public virtual void AddMeshData(MeshData addToMeshData, Chunk chunk, IntVector3 localPosition, Vector3 position, float voxelSize)
         {
