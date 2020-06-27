@@ -59,10 +59,9 @@ namespace Voxic.Chunks
                         Voxels[i, j, k] = new Voxel(VoxelDataManager.NULL_VOXEL_DATA);
                     }
 
-            // TODO: Extract object generation from this method
-            //Random.InitState(1370);
-            DoChunkyThings(chunkSize);
-            //DoTestyThings();
+			// TODO: Extract object generation from this method
+			DoChunkyThings(chunkSize);
+			//DoTestyThings();
         }
 
         private void DoTestyThings()
