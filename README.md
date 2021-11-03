@@ -1,6 +1,6 @@
 # Voxic Engine
-The start of a voxel rendering engine
-Currently supports both blocks and wedges!
+The start of a voxel rendering engine built in Unity.
+Currently supports wedges and blocks!
 
 # Images
 <img src="./_Images/0.jpg" width="512" />
